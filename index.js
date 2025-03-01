@@ -26,9 +26,11 @@ db.connect(err => {
 
 const userRoutes = require('./Routers/users_R');
 const measurementRoutes = require('./Routers/measurements_R');
+const reportRoutes = require('./Routers/reports_R');
 
 app.use('/users', userRoutes);
 app.use('/measurements', measurementRoutes);
+app.use('/reports', reportRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
