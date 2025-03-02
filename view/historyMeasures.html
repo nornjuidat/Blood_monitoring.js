@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>היסטוריית מדידות</title>
+    <link rel="stylesheet" href="bpm.css">
+</head>
+<body>
+<h1>היסטוריית מדידות</h1>
+
+<label for="user">בחר משתמש:</label>
+<select id="user" name="user"></select>
+
+<label for="startDate">מתאריך:</label>
+<input type="date" id="startDate">
+
+<label for="endDate">עד תאריך:</label>
+<input type="date" id="endDate">
+
+<button onclick="fetchMeasurements()">הצג מדידות</button>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>תאריך</th>
+        <th>לחץ דם סיסטולי</th>
+        <th>לחץ דם דיאסטולי</th>
+        <th>דופק</th>
+    </tr>
+    </thead>
+    <tbody id="measurementsTable">
+    <!-- הנתונים יוטענו כאן -->
+    </tbody>
+</table>
+
+<script src="bpm.js"></script>
+</body>
+</html>
