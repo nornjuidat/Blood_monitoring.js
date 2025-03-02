@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הוספת מדידה</title>
+  <link rel="stylesheet" href="bpm.css">
+</head>
+<body>
+<h1>הוספת מדידת לחץ דם</h1>
+
+<form id="addMeasurementForm">
+  <label for="user">בחר משתמש:</label>
+  <select id="user" name="user"></select>
+
+  <label for="systolic">לחץ דם סיסטולי:</label>
+  <input type="number" id="systolic" name="systolic" required>
+
+  <label for="diastolic">לחץ דם דיאסטולי:</label>
+  <input type="number" id="diastolic" name="diastolic" required>
+
+  <label for="pulse">דופק:</label>
+  <input type="number" id="pulse" name="pulse" required>
+
+  <button type="submit">שלח</button>
+</form>
+
+<script src="bpm.js"></script>
+</body>
+</html>
