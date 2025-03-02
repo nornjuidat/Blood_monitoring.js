@@ -1,39 +1,24 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql2');
-const swaggerUi = require('swagger-ui-express');
-const swaggerFile = require('./swagger-output.json');
+const path = require('path');
 
 const app = express();
-const port = 3000;
+const PORT = 3000;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'blood_pressure_db'
+app.use(express.static(path.join(__dirname, 'View')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'View', 'home.html'));
 });
 
-db.connect(err => {
-    if (err) {
-        console.error('Database connection failed:', err);
-    } else {
-        console.log('Connected to database');
-    }
-});
+const userRoutes = require('./routes/userRoutes');
+const measurementRoutes = require('./routes/measurementRoutes');
 
-const userRoutes = require('./Routers/users_R');
-const measurementRoutes = require('./Routers/measurements_R');
-const reportRoutes = require('./Routers/reports_R');
+app.use('/api/users', userRoutes);
+app.use('/api/measurements', measurementRoutes);
 
-app.use('/users', userRoutes);
-app.use('/measurements', measurementRoutes);
-app.use('/reports', reportRoutes);
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
-
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+// הפעלת השרת
+app.listen(PORT, () => {
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
