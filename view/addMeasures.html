@@ -1,30 +1,88 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>הוספת מדידה</title>
+  <title> Blood Pressure Measurement</title>
   <link rel="stylesheet" href="bpm.css">
+  <script src="bpm.js" ></script>
 </head>
-<body>
-<h1>הוספת מדידת לחץ דם</h1>
+<body onload="getUsers()">
+<div class="sidenav">
+  <div class="logo">
+    <i class="fas fa-heartbeat"></i>
+    <span>BPM App</span>
+  </div>
+  <ul>
+    <li>
+      <a href="home.html" class="active">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+    <li>
+      <a href="addMeasures.html">
+        <i class="fas fa-plus-circle"></i>
+        <span>Add Measures</span>
+      </a>
+    </li>
+    <li>
+      <a href="historyMeasures.html">
+        <i class="fas fa-history"></i>
+        <span>History Measures</span>
+      </a>
+    </li>
+    <li>
+      <a href="allUsers.html">
+        <i class="fas fa-users"></i>
+        <span>All Patients</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div class="main-content">
+  <h1 class="page-title">Add Blood Pressure Measures</h1>
+  <div class="content">
+    <div class="form-container glossy">
+      <div class="form-group">
+        <label for="selectPatients">Select Patient</label>
+        <div class="input-field">
+          <select  id="selectPatients" onclick="showMetricsForm()"></select>
+        </div>
+      </div>
+      <div class="metrics-container" id="metricsForm">
+        <div class="form-group" >
+          <label for="systolic">Systolic</label>
+          <div class="input-field">
+            <input type="number" min="0" id="systolic" name="systolic" placeholder="Systolic">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="diastolic">Diastolic</label>
+          <div class="input-field">
+            <input type="number" min="0" id="diastolic" name="diastolic" placeholder="Diastolic">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="pulse">Pulse</label>
+          <div class="input-field">
+            <input type="number" min="0" id="pulse" name="pulse" placeholder="Pulse">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="date">Date</label>
+          <div class="input-field">
+            <input type="date" id="date" name="date">
+          </div>
+        </div>
+        <button type="submit" id="saveButton" onclick="AddMeasures()">
+          Save Measurement
+        </button>
+      </div>
+    </div>
 
-<form id="addMeasurementForm">
-  <label for="user">בחר משתמש:</label>
-  <select id="user" name="user"></select>
+  </div>
 
-  <label for="systolic">לחץ דם סיסטולי:</label>
-  <input type="number" id="systolic" name="systolic" required>
-
-  <label for="diastolic">לחץ דם דיאסטולי:</label>
-  <input type="number" id="diastolic" name="diastolic" required>
-
-  <label for="pulse">דופק:</label>
-  <input type="number" id="pulse" name="pulse" required>
-
-  <button type="submit">שלח</button>
-</form>
-
-<script src="bpm.js"></script>
+</div>
 </body>
 </html>

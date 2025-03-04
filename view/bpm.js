@@ -1,67 +1,63 @@
-document.addEventListener("DOMContentLoaded", function () {
-    if (document.getElementById("user")) {
-        loadUsers();
+async function getUsers() {
+    let url= "/users";
+    let res = await fetch(url);
+    let replay = await res.json();
+    let users= replay.data;
+    const select= document.getElementById("selectPatients")
+    if (select){
+        let s = '<option value="">Select a patient</option>';
+        for (let user_id in users) {
+            s += `<option value="${users[user_id].id}" >${users[user_id].full_name}</option>`;
+        }
+        select.innerHTML = s;
+
     }
-});
-function loadUsers() {
-    fetch("/api/users")
-        .then(response => response.json())
-        .then(users => {
-            const userSelect = document.getElementById("user");
-            users.forEach(user => {
-                let option = document.createElement("option");
-                option.value = user.id;
-                option.textContent = user.name;
-                userSelect.appendChild(option);
-            });
-        })
-        .catch(error => console.error("Error loading users:", error));
+    return users
 }
+function showMetricsForm() {
+    const metricsForm = document.getElementById("metricsForm");
+    if (document.getElementById("selectPatients").value) {
+        metricsForm.style.display = "block";
+        metricsForm.classList.add("active");
+    } else {
+        metricsForm.style.display = "none";
+        metricsForm.classList.remove("active");
+    }
+}
+async function getMeasures(){
+    let url= "/measures";
+    let res = await fetch(url);
+    let replay = await res.json();
+    let data=replay.data;
+    return data;
+}
+async function AddMeasures() {
+    let user_id= document.getElementById("selectPatients").value;
+    let systolic = document.getElementById("systolic").value;
+    let diastolic = document.getElementById("diastolic").value;
+    let pulse = document.getElementById("pulse").value;
+    let date = document.getElementById("date").value;
 
-const addMeasurementForm = document.getElementById("addMeasurementForm");
-if (addMeasurementForm) {
-    addMeasurementForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const userId = document.getElementById("user").value;
-        const systolic = document.getElementById("systolic").value;
-        const diastolic = document.getElementById("diastolic").value;
-        const pulse = document.getElementById("pulse").value;
-
-        fetch("/api/measurements", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, systolic, diastolic, pulse })
-        })
-            .then(response => response.json())
-            .then(data => {
-                alert("מדידה נוספה בהצלחה!");
-                addMeasurementForm.reset();
-            })
-            .catch(error => console.error("Error adding measurement:", error));
+    if (!systolic || !diastolic || !pulse || !date) {
+        alert('Please fill in all measurement fields');
+        return;
+    }
+    let url= "/measures";
+    let res = await fetch(url,{
+        method:'POST',
+        headers:{
+            "Content-Type": 'application/json'
+        },
+        body:JSON.stringify({
+            user_id: user_id,
+            sys_high: systolic,
+            dia_low: diastolic,
+            pulse: pulse,
+            date:date
+        }),
     });
-}
-function fetchMeasurements() {
-    const userId = document.getElementById("user").value;
-    const startDate = document.getElementById("startDate").value;
-    const endDate = document.getElementById("endDate").value;
-
-    fetch(`/api/measurements?userId=${userId}&startDate=${startDate}&endDate=${endDate}`)
-        .then(response => response.json())
-        .then(measurements => {
-            const tableBody = document.getElementById("measurementsTable");
-            tableBody.innerHTML = "";
-            measurements.forEach(measurement => {
-                let row = document.createElement("tr");
-                if (measurement.isAbnormal) row.classList.add("abnormal");
-                row.innerHTML = `
-                    <td>${measurement.date}</td>
-                    <td>${measurement.systolic}</td>
-                    <td>${measurement.diastolic}</td>
-                    <td>${measurement.pulse}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        })
-        .catch(error => console.error("Error fetching measurements:", error));
+    let data = await res.json();
+    if (data.msg){
+        alert("Measurement saved successfully!");
+    }
 }

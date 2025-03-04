@@ -1,39 +1,87 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>היסטוריית מדידות</title>
+    <title>BPM App - Blood Pressure Measurement</title>
     <link rel="stylesheet" href="bpm.css">
+    <script src="bpm.js" defer></script>
 </head>
-<body>
-<h1>היסטוריית מדידות</h1>
-
-<label for="user">בחר משתמש:</label>
-<select id="user" name="user"></select>
-
-<label for="startDate">מתאריך:</label>
-<input type="date" id="startDate">
-
-<label for="endDate">עד תאריך:</label>
-<input type="date" id="endDate">
-
-<button onclick="fetchMeasurements()">הצג מדידות</button>
-
-<table border="1">
-    <thead>
-    <tr>
-        <th>תאריך</th>
-        <th>לחץ דם סיסטולי</th>
-        <th>לחץ דם דיאסטולי</th>
-        <th>דופק</th>
-    </tr>
-    </thead>
-    <tbody id="measurementsTable">
-    <!-- הנתונים יוטענו כאן -->
-    </tbody>
-</table>
-
-<script src="bpm.js"></script>
+<body onload="getUsers()">
+<div class="sidenav">
+    <div class="logo">
+        <i class="fas fa-heartbeat"></i>
+        <span>BPM App</span>
+    </div>
+    <ul>
+        <li>
+            <a href="home.html" class="active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a href="addMeasures.html">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add Measures</span>
+            </a>
+        </li>
+        <li>
+            <a href="historyMeasures.html">
+                <i class="fas fa-history"></i>
+                <span>History Measures</span>
+            </a>
+        </li>
+        <li>
+            <a href="allUsers.html">
+                <i class="fas fa-users"></i>
+                <span>All Patients</span>
+            </a>
+        </li>
+    </ul>
+</div>
+<div class="main-content">
+    <h1 class="page-title">History Measures</h1>
+    <div class="content">
+        <div class="form-container-measures glossy">
+            <div class="form-group">
+                <label for="selectPatients">Select Patient</label>
+                <div class="input-field">
+                    <select id="selectPatients"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="startDate">Select Start Date : </label>
+                <div class="input-field">
+                    <input type="date" id="startDate" name="date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="endDate">Select End Date : </label>
+                <div class="input-field">
+                    <input type="date" id="endDate" name="date">
+                </div>
+            </div>
+            <button onclick="CreateMeasuresTable()">Search</button>
+        </div>
+        <div class="table-container glossy" >
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Systolic</th>
+                        <th>Diastolic</th>
+                        <th>Pulse</th>
+                        <th>Update</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody id="MeasuresTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
