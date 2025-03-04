@@ -1,5 +1,5 @@
 const { isBefore, isSameDay } = require('date-fns');
-const db_pool = require('../config/db');
+const db_pool = require('../db');
 
 async function executeQuery(query, params = []) {
     const promisePool = db_pool.promise();
