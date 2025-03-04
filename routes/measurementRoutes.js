@@ -5,6 +5,19 @@ module.exports = router;
 const measures_Mid =require('../Middleware/measures_Mid');
 const users_Mid =require('../Middleware/users_Mid');
 
+router.post('/add-measurement', (req, res) => {
+    const { user, systolic, diastolic, pulse } = req.body;
+
+    if (!user || !systolic || !diastolic || !pulse) {
+        return res.status(400).json({ message: "יש למלא את כל השדות" });
+    }
+
+    // כאן ניתן להוסיף את הלוגיקה לשמירת הנתונים בבסיס הנתונים
+    console.log(`משתמש ${user} הוסיף מדידה: ${systolic}/${diastolic}, דופק: ${pulse}`);
+
+    res.status(200).json({ message: "המדידה נוספה בהצלחה!" });
+});
+
 router.post('/measures', [measures_Mid.AddMeasures],(req, res) => {
     if(req.success){
         res.status(200).json({msg:"ok",Last_Id:req.insertId});
