@@ -1,61 +1,63 @@
+// npm i express body-parser ejs htmlspecialchars mysql2  slashes@2.0.0  swagger-autogen swagger-ui-express
+const PORT = 3000;
 const express = require('express');
 const path = require('path');
-const cors = require('cors');
-
-// Swagger
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-
 const app = express();
-const PORT = 3000;
+const bodyParser = require("body-parser");
 
-// Middleware לטיפול בהרשאות CORS (אם תרצה לגשת ל-API ממקור אחר)
-app.use(cors());
+const swaggerAutogen = require("swagger-autogen")();
+const swaggerUi = require('swagger-ui-express');
+const swaggerOutputFile = "./swagger-output.json";
+const routes = ["./Routers/*.js"];
 
-// Middleware לקריאת JSON בבקשות POST
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // תמיכה בטפסים
+swaggerAutogen(swaggerOutputFile, routes, doc).then(() => {
+    const swaggerDocument = require(swaggerOutputFile);
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 
-// הגדרת תיקייה סטטית לקבצי ה-HTML, CSS ו-JS שבתוך `View`
-app.use(express.static(path.join(__dirname, 'View')));
-
-// נתיב ברירת מחדל – טוען את עמוד הבית
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'View', 'home.html'));
-});
-
-// הגדרת Swagger
-const swaggerOptions = {
-    definition: {
-        openapi: '3.0.0',
+    const doc = {
         info: {
-            title: 'Blood Pressure Tracker API',
-            version: '1.0.0',
-            description: 'API לניהול משתמשים ומדידות לחץ דם',
+            title: "My API",
+            description: "blood_pressure",
         },
-        servers: [{ url: 'http://localhost:3000' }],
-    },
-    apis: ['./routes/*.js'], // קבצי הנתיבים עם התיעוד
-};
+        host: `localhost:${port}`,
+    };
+
+
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
+    app.use(bodyParser.json());
+
+    let db_M = require("./db");
+    global.db_pool = db_M.pool;
+
+    app.use(express.static(path.join(__dirname, "View")));
+    app.get("/", (req, res) => {
+        res.status(200).sendFile(path.join(__dirname, "View/home.html"));
+    });
+    app.get("/patients", (req, res) => {
+        res.status(200).sendFile(path.join(__dirname, "View/allusers.html"));
+    });
+    app.get("/measure", (req, res) => {
+        res.status(200).sendFile(path.join(__dirname, "View/addMeasures.html"));
+    });
+
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // טעינת הנתיבים של ה-API
 const userRoutes = require('./routes/userRoutes');
+app.use("/", userRoutes);
+
 const measurementRoutes = require('./routes/measurementRoutes');
+app.use("/", measurementRoutes);
 
-app.use('/api/users', userRoutes);
-app.use('/api/measurements', measurementRoutes);
 
-// Middleware לטיפול בשגיאות
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'משהו השתבש בשרת!' });
-});
+
 
 // הפעלת השרת
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
     console.log(`📄 Swagger Docs available at http://localhost:${PORT}/api-docs`);
+});
 });
