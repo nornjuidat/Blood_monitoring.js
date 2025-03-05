@@ -125,3 +125,36 @@ async function DeleteMeasures(idx) {
     await CreateMeasuresTable();
     alert(message || "Measurement deleted successfully!");
 }
+async function AvgMeasuresByMonth() {
+    const month = document.getElementById("month").value;
+    const year = document.getElementById("year").value;
+
+    if (!month || !year) return alert('Please fill in all the fields');
+
+    const res = await fetch("/measuresByMonth", {
+        method: 'POST',
+        headers: { "Content-Type": 'application/json' },
+        body: JSON.stringify({ month, year })
+    });
+    if (!res.ok) return alert("No measurement found in those dates.");
+
+    const { data } = await res.json();
+    const row = data.map((measure, idx) => `
+        <tr>
+            <td>${Number(idx) + 1}</td>
+            <td>${measure.userName}</td>
+            <td>${measure.sysAvg}/ ${measure.sysCnt || 0}</td>
+            <td>${measure.diaAvg}/ ${measure.diaCnt || 0}</td>
+            <td>${measure.pulseAvg}/ ${measure.pulseCnt || 0}</td>
+            <td>${measure.pulseCnt + measure.diaCnt + measure.sysCnt || 0}</td>
+        </tr>
+    `).join('');
+    document.getElementById("avgMeasures").innerHTML = row;
+}
+
+async function BuildPage() {
+    const users = await getUsers();
+    const measures = await getMeasures();
+    document.getElementById("total-measure").innerHTML = measures.length;
+    document.getElementById("total-patients").innerHTML = users.length;
+}
