@@ -1,163 +1,221 @@
-const { isBefore, isSameDay } = require('date-fns');
-const db_pool = require('../db');
+const {isBefore, isSameDay}= require('date-fns');
 
-async function executeQuery(query, params = []) {
+async function AddMeasures(req, res,next) {
+    let user_id    = parseInt(req.body.user_id);
+    let date               = req.body.date;
+    let sys_high= Number(req.body.sys_high);
+    let dia_low= Number(req.body.dia_low);
+    let pulse= Number(req.body.pulse);
+
+    if (user_id === undefined)throw new Error('Id is not valid, please check again.');
+    if (sys_high === undefined)throw new Error('Must enter a systolic value.');
+    if (dia_low === undefined)throw new Error('Must enter a diastolic value.');
+    if (pulse === undefined)throw new Error('Must enter a pulse value.');
+    if (date === undefined)throw new Error('Date is not valid.');
+
+    let Query="INSERT INTO `measures` ";
+    Query += " ( `user_id`, `date`, `sys_high`, `dia_low`, `pulse`) ";
+    Query += " VALUES ";
+    Query += ` ('${user_id}','${date}','${sys_high}','${dia_low}','${pulse}') `;
+
     const promisePool = db_pool.promise();
+    let rows=[];
     try {
-        const [rows] = await promisePool.query(query, params);
-        return rows;
-    } catch (error) {
-        console.error('Database error:', error);
-        throw new Error('Database operation failed.');
+        [rows] = await promisePool.query(Query);
+        req.insertId=rows.insertId;
+        req.success=true;
+    } catch (err) {
+        req.success=false;
+        console.log(err);
     }
+    next();
 }
-
-async function AddMeasures(req, res, next) {
+async function GetMeasures(req,res,next){
+    let Query = `SELECT * FROM measures `;
+    const promisePool = db_pool.promise();
+    let rows=[];
     try {
-        const { user_id, date, sys_high, dia_low, pulse } = req.body;
-        if (!user_id || !date || !sys_high || !dia_low || !pulse) {
-            throw new Error('All fields are required.');
+        [rows] = await promisePool.query(Query);
+        if (!rows.length) throw new Error('No rows found.');
+        req.success=true;
+        req.all_measures=rows;
+    } catch (err) {
+        req.success=false;
+        console.log(err);
+    }
+    next();
+}
+async function UpdateMeasures(req,res,next){
+    let idx             = parseInt(req.body.idx);
+    let date               = req.body.date;
+    let sys_high= Number(req.body.sys_high);
+    let dia_low= Number(req.body.dia_low);
+    let pulse= Number(req.body.pulse);
+
+    if (idx === undefined)throw new Error('Id is not valid, please check again.');
+    if (sys_high === undefined)throw new Error('Must enter a systolic value.');
+    if (dia_low === undefined)throw new Error('Must enter a diastolic value.');
+    if (pulse === undefined)throw new Error('Must enter a pulse value.');
+    if (date === undefined)throw new Error('Date is not valid.');
+
+
+    let Query = `UPDATE measures SET `;
+    Query += ` date = '${date}' , `;
+    Query += ` sys_high = '${sys_high}' , `;
+    Query += ` dia_low = '${dia_low}' , `;
+    Query += ` pulse = '${pulse}' `;
+    Query += ` WHERE id = ${idx} `;
+
+    const promisePool = db_pool.promise();
+    let rows=[];
+    try {
+        [rows] = await promisePool.query(Query);
+        req.success=true;
+    } catch (err) {
+        req.success=false;
+        console.log(err);
+    }
+    next();
+}
+async function DeleteMeasures(req,res,next){
+    let idx  = parseInt(req.body.idx);
+    let Query = `DELETE FROM measures  `;
+    Query += ` WHERE id = ${idx} `;
+    const promisePool = db_pool.promise();
+    let rows=[];
+    try {
+        [rows] = await promisePool.query(Query);
+        req.success=true;
+    } catch (err) {
+        req.success=false;
+        console.log(err);
+    }
+    next();
+}
+async function GetMeasuresByUId(req,res,next){
+    let user_id= parseInt(req.body.user_id);
+    let dates= req.body;
+
+    if (user_id === undefined)throw new Error('Id is not valid, please check again.');
+
+    let Query = `SELECT * FROM measures `;
+    Query += ` WHERE user_id = ${user_id} `;
+
+    if (dates.startDate && dates.endDate){
+        if (isBefore(dates.startDate,dates.endDate) || isSameDay(dates.endDate,dates.startDate)){
+            Query += ` AND date BETWEEN '${dates.startDate}' AND '${dates.endDate}'  `;
         }
-
-        const query = `INSERT INTO measures (user_id, date, sys_high, dia_low, pulse) VALUES (?, ?, ?, ?, ?)`;
-        const result = await executeQuery(query, [user_id, date, sys_high, dia_low, pulse]);
-
-        req.insertId = result.insertId;
-        req.success = true;
+    }
+    const promisePool = db_pool.promise();
+    let rows=[];
+    try {
+        [rows] = await promisePool.query(Query);
+        if (!rows.length) throw new Error('No rows found.');
+        req.success=true;
+        req.measuresByUId=rows;
     } catch (err) {
-        req.success = false;
-        console.error(err);
+        req.success=false;
+        console.log(err);
     }
     next();
 }
+async function GetMeasuresAvg(req,res,next){
+    let user_id= parseInt(req.body.user_id);
+    let dates= req.body;
 
-async function GetMeasures(req, res, next) {
-    try {
-        const query = `SELECT * FROM measures`;
-        req.all_measures = await executeQuery(query);
-        req.success = req.all_measures.length > 0;
-    } catch (err) {
-        req.success = false;
-        console.error(err);
-    }
-    next();
-}
+    if (user_id === undefined)throw new Error('Id is not valid, please check again.');
 
-async function UpdateMeasures(req, res, next) {
-    try {
-        const { idx, date, sys_high, dia_low, pulse } = req.body;
-        if (!idx || !date || !sys_high || !dia_low || !pulse) {
-            throw new Error('All fields are required.');
+    let Query = `SELECT avg(sys_high) AS sysAvg, avg(dia_low) AS diaAvg,avg(pulse) AS pulseAvg FROM measures `;
+    Query += ` WHERE user_id = ${user_id} `;
+
+    if (dates.startDate && dates.endDate){
+        if (isBefore(dates.startDate,dates.endDate) || isSameDay(dates.endDate,dates.startDate)){
+            Query += ` AND date BETWEEN '${dates.startDate}' AND '${dates.endDate}'  `;
         }
+    }
+    Query += ` GROUP BY user_id `;
 
-        const query = `UPDATE measures SET date = ?, sys_high = ?, dia_low = ?, pulse = ? WHERE id = ?`;
-        await executeQuery(query, [date, sys_high, dia_low, pulse, idx]);
-
-        req.success = true;
+    const promisePool = db_pool.promise();
+    let rows=[];
+    try {
+        [rows] = await promisePool.query(Query);
+        req.success=true;
+        req.measuresAvg=rows;
     } catch (err) {
-        req.success = false;
-        console.error(err);
+        req.success=false;
+        console.log(err);
     }
     next();
 }
-
-async function DeleteMeasures(req, res, next) {
+async function CriticalMeasures(req,res,next){
     try {
-        const { idx } = req.body;
-        if (!idx) throw new Error('ID is required.');
+        let measuresAvg = req.measuresAvg;
+        let measuresByUId = req.measuresByUId;
 
-        const query = `DELETE FROM measures WHERE id = ?`;
-        await executeQuery(query, [idx]);
-
-        req.success = true;
-    } catch (err) {
-        req.success = false;
-        console.error(err);
-    }
-    next();
-}
-
-async function GetMeasuresByUId(req, res, next) {
-    try {
-        const { user_id, startDate, endDate } = req.body;
-        if (!user_id) throw new Error('User ID is required.');
-
-        let query = `SELECT * FROM measures WHERE user_id = ?`;
-        const params = [user_id];
-
-        if (startDate && endDate && (isBefore(startDate, endDate) || isSameDay(startDate, endDate))) {
-            query += ` AND date BETWEEN ? AND ?`;
-            params.push(startDate, endDate);
-        }
-
-        req.measuresByUId = await executeQuery(query, params);
-        req.success = req.measuresByUId.length > 0;
-    } catch (err) {
-        req.success = false;
-        console.error(err);
-    }
-    next();
-}
-
-async function GetMeasuresAvg(req, res, next) {
-    try {
-        const { user_id, startDate, endDate } = req.body;
-        if (!user_id) throw new Error('User ID is required.');
-
-        let query = `SELECT AVG(sys_high) AS sysAvg, AVG(dia_low) AS diaAvg, AVG(pulse) AS pulseAvg FROM measures WHERE user_id = ?`;
-        const params = [user_id];
-
-        if (startDate && endDate && (isBefore(startDate, endDate) || isSameDay(startDate, endDate))) {
-            query += ` AND date BETWEEN ? AND ?`;
-            params.push(startDate, endDate);
-        }
-
-        req.measuresAvg = await executeQuery(query, params);
-        req.success = req.measuresAvg.length > 0;
-    } catch (err) {
-        req.success = false;
-        console.error(err);
-    }
-    next();
-}
-
-async function CriticalMeasures(req, res, next) {
-    try {
-        const measuresAvg = req.measuresAvg[0];
-        const measuresByUId = req.measuresByUId;
-
-        measuresByUId.forEach(measure => {
-            measure.critical = (
-                measure.sys_high > measuresAvg.sysAvg * 1.2 || measure.sys_high < measuresAvg.sysAvg * 0.8 ||
-                measure.dia_low > measuresAvg.diaAvg * 1.2 || measure.dia_low < measuresAvg.diaAvg * 0.8 ||
-                measure.pulse > measuresAvg.pulseAvg * 1.2 || measure.pulse < measuresAvg.pulseAvg * 0.8
-            );
-        });
-
+        measuresByUId.forEach((measure) => {
+            measure.critical = false;
+            if (measure.sys_high > measuresAvg[0].sysAvg * 1.2||measure.dia_low > measuresAvg[0].diaAvg * 1.2||measure.pulse > measuresAvg[0].pulseAvg * 1.2 || measure.sys_high < measuresAvg[0].sysAvg * 0.8||measure.dia_low < measuresAvg[0].diaAvg * 0.8||measure.pulse < measuresAvg[0].pulseAvg * 0.8) {
+                measure.critical = true;
+            }
+        })
         req.criticalData = measuresByUId;
     } catch (err) {
-        req.success = false;
-        console.error(err);
+        req.success=false;
+        console.log(err);
     }
     next();
 }
+async function AvgMeasuresByMonth(req,res,next){
+    let month=Number(req.body.month);
+    let year=Number(req.body.year);
+    let allUsers= req.all_users;
 
-async function AvgMeasuresByMonth(req, res, next) {
+    if (month>12 || month<1 || month === undefined)throw new Error('Month is not valid, please check again.');
+
+    let Query = `SELECT user_id,avg(sys_high) AS sysAvg, avg(dia_low) AS diaAvg,avg(pulse) AS pulseAvg FROM measures `;
+    Query += ` WHERE MONTH(date)= ${month} and Year(date) = ${year} `;
+    Query += ` GROUP BY user_id `;
+
+    let Query2= `select * from measures where MONTH(date)= ${month} and Year(date) = ${year} `;
+
+    const promisePool = db_pool.promise();
+    let rows=[];
+    let rows2=[];
     try {
-        const { month, year } = req.body;
-        if (!month || !year || month < 1 || month > 12) throw new Error('Invalid month or year.');
+        [rows] = await promisePool.query(Query);
+        [rows2] = await promisePool.query(Query2);
 
-        const query = `SELECT user_id, AVG(sys_high) AS sysAvg, AVG(dia_low) AS diaAvg, AVG(pulse) AS pulseAvg FROM measures WHERE MONTH(date) = ? AND YEAR(date) = ? GROUP BY user_id`;
-        req.AvgMeasuresByMonth = await executeQuery(query, [month, year]);
-        req.success = req.AvgMeasuresByMonth.length > 0;
+        if (!rows.length || !rows2.length) throw new Error('No rows found.');
+
+        rows.forEach(avg =>{
+            rows2.forEach(measure =>{
+                if (avg.user_id === measure.user_id){
+                    if (measure.sys_high > avg.sysAvg * 1.2 || measure.sys_high < avg.sysAvg * 0.8) {
+                        avg.sysCnt = avg.sysCnt ? avg.sysCnt+1 : 1;
+                    }
+                    if (measure.dia_low > avg.diaAvg * 1.2 || measure.dia_low < avg.diaAvg * 0.8) {
+                        avg.diaCnt = avg.diaCnt ? avg.diaCnt+1 : 1;
+                    }
+                    if (measure.pulse > avg.pulseAvg * 1.2 || measure.pulse < avg.pulseAvg * 0.8) {
+                        avg.pulseCnt = avg.pulseCnt ? avg.pulseCnt+1 : 1;
+                    }
+                }
+            })
+            allUsers.forEach(user=>{
+                if (avg.user_id === user.id){
+                    avg.userName= user.full_name;
+                }
+            })
+        })
+        req.success=true;
+        req.AvgMeasuresByMonth=rows;
     } catch (err) {
-        req.success = false;
-        console.error(err);
+        req.success=false;
+        console.log(err);
     }
     next();
 }
-
-module.exports = {
+module.exports={
     AddMeasures,
     GetMeasures,
     UpdateMeasures,
