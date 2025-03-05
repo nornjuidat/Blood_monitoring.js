@@ -1,28 +1,81 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>רשימת משתמשים</title>
+  <title>Blood Pressure </title>
   <link rel="stylesheet" href="bpm.css">
+  <script src="bpm.js" defer></script>
 </head>
 <body>
-<h1>רשימת משתמשים</h1>
-
-<table border="1">
-  <thead>
-  <tr>
-    <th>שם משתמש</th>
-    <th>ממוצע לחץ דם סיסטולי</th>
-    <th>ממוצע לחץ דם דיאסטולי</th>
-    <th>כמות חריגות</th>
-  </tr>
-  </thead>
-  <tbody id="usersTable">
-  <!-- הנתונים יוטענו כאן -->
-  </tbody>
-</table>
-
-<script src="bpm.js"></script>
+<div class="sidenav">
+  <div class="logo">
+    <i class="fas fa-heartbeat"></i> <span>BPM </span>
+  </div>
+  <ul>
+    <li>
+      <a href="home.html" class="active">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+    <li>
+      <a href="addMeasures.html">
+        <i class="fas fa-plus-circle"></i>
+        <span>Add Measures</span>
+      </a>
+    </li>
+    <li>
+      <a href="historyMeasures.html">
+        <i class="fas fa-history"></i>
+        <span>History Measures</span>
+      </a>
+    </li>
+    <li>
+      <a href="allUsers.html">
+        <i class="fas fa-users"></i>
+        <span>All Patients</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div class="main-content">
+  <h1 class="page-title">All Patients Average Measures</h1>
+  <div class="content">
+    <div class="form-container-measures glossy">
+      <div class="form-group">
+        <label for="month">Select Month :</label>
+        <div class="input-field">
+          <input type="number" min="1" max="12" id="month" >
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="year">Select Year :</label>
+        <div class="input-field">
+          <input type="number" min="0" id="year" >
+        </div>
+      </div>
+      <button onclick="AvgMeasuresByMonth()">Search</button>
+    </div>
+    <div class="table-container glossy">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+          <tr>
+            <th>#</th>
+            <th>Patient Name</th>
+            <th>Systolic Avg/ Critical</th>
+            <th>Diastolic Avg/ Critical</th>
+            <th>Pulse Avg/ Critical</th>
+            <th>Total Critical</th>
+          </tr>
+          </thead>
+          <tbody id="avgMeasures"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 </body>
 </html>
