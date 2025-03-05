@@ -90,3 +90,38 @@ function UpdateMeasuresForm(idx) {
 
     setTimeout(() => modalOverlay.classList.add('active'), 10);
 }
+function closeModal() {
+    const modalOverlay = document.getElementById('modalOverlay');
+    modalOverlay.classList.remove('active');
+    setTimeout(() => document.body.removeChild(modalOverlay), 300);
+}
+
+async function UpdateMeasures(idx) {
+    const systolic = document.getElementById("systolic").value;
+    const diastolic = document.getElementById("diastolic").value;
+    const pulse = document.getElementById("pulse").value;
+    const date = document.getElementById("date").value;
+
+    if (!systolic || !diastolic || !pulse || !date) return alert('Please fill in all measurement fields');
+
+    const res = await fetch("/measures", {
+        method: 'PUT',
+        headers: { "Content-Type": 'application/json' },
+        body: JSON.stringify({ idx, sys_high: systolic, dia_low: diastolic, pulse, date })
+    });
+    const { msg } = await res.json();
+    closeModal();
+    await CreateMeasuresTable();
+    if (msg) setTimeout(() => alert("Measurement updated successfully!"), 500);
+}
+
+async function DeleteMeasures(idx) {
+    const res = await fetch("/measures", {
+        method: 'DELETE',
+        headers: { "Content-Type": 'application/json' },
+        body: JSON.stringify({ idx })
+    });
+    const { message } = await res.json();
+    await CreateMeasuresTable();
+    alert(message || "Measurement deleted successfully!");
+}
