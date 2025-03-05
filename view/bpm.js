@@ -38,3 +38,55 @@ async function AddMeasures() {
     const { msg } = await res.json();
     if (msg) alert("Measurement saved successfully!");
 }
+async function CreateMeasuresTable() {
+    const { value: user_id } = document.getElementById("selectPatients");
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    const res = await fetch("/measuresByUId", {
+        method: 'POST',
+        headers: { "Content-Type": 'application/json' },
+        body: JSON.stringify({ user_id, startDate, endDate })
+    });
+    const { data } = await res.json();
+    const row = data.map((measure, idx) => `
+        <tr class="${measure.critical ? 'crit' : ''}">
+            <td>${Number(idx) + 1}</td>
+            <td>${new Date(measure.date).toLocaleDateString('he-IL')}</td>
+            <td>${measure.sys_high}</td>
+            <td>${measure.dia_low}</td>
+            <td>${measure.pulse}</td>
+            <td><button onclick="UpdateMeasuresForm(${measure.id})">Edit</button></td>
+            <td><button onclick="DeleteMeasures(${measure.id})">Delete</button></td>
+        </tr>
+    `).join('');
+    document.getElementById("MeasuresTable").innerHTML = row;
+}
+function UpdateMeasuresForm(idx) {
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'modal-overlay';
+    modalOverlay.id = 'modalOverlay';
+    modalOverlay.innerHTML = `
+        <div class="modal-content glossy">
+            <div class="form-container">
+                <h2>Update Measurement</h2>
+                ${['systolic', 'diastolic', 'pulse', 'date'].map(field => `
+                    <div class="form-group">
+                        <label for="${field}">${field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                        <div class="input-field">
+                            <input type="${field === 'date' ? 'date' : 'number'}" id="${field}" name="${field}" placeholder="${field.charAt(0).toUpperCase() + field.slice(1)}">
+                        </div>
+                    </div>
+                `).join('')}
+                <div class="modal-buttons">
+                    <button type="submit" onclick="UpdateMeasures(${idx})">Save Measurement</button>
+                    <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modalOverlay);
+    modalOverlay.addEventListener('click', e => e.target === modalOverlay && closeModal());
+
+    setTimeout(() => modalOverlay.classList.add('active'), 10);
+}
