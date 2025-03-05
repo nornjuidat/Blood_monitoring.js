@@ -1,166 +1,160 @@
-/* כללי */
-body {
-    font-family: Arial, sans-serif;
-    direction: rtl;
-    text-align: right;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    display: flex;
+:root {
+    --primary-color: #ff5733; /* צבע ראשי */
+    --secondary-color: #f0a500; /* צבע משני */
+    --accent-color: #8e44ad; /* צבע מוסף */
+    --dark-color: #2c3e50; /* צבע כהה */
+    --light-color: #ecf0f1; /* צבע בהיר */
+    --success-color: #27ae60; /* צבע הצלחה */
+    --warning-color: #e74c3c; /* צבע אזהרה */
 }
 
-/* סרגל צד (תפריט ניווט) */
-.sidenav {
-    width: 250px;
-    height: 100vh;
-    background-color: #343a40;
-    color: white;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: var(--light-color);
+    min-height: 100vh;
     display: flex;
-    flex-direction: column;
-    padding-top: 20px;
-    position: fixed;
+    overflow: hidden;
+}
+
+.sidenav {
+    width: 280px;
+    background: rgba(0, 0, 0, 0.8); /* שינוי צבע סרגל צדדי */
+    backdrop-filter: blur(15px); /* אפקט בלור חזק יותר */
+    border-right: 2px solid rgba(255, 255, 255, 0.1);
+    height: 100vh;
+    padding: 2rem 0;
+    transition: all 0.3s ease;
+    z-index: 10;
+    flex-shrink: 0;
 }
 
 .sidenav .logo {
     text-align: center;
-    font-size: 22px;
+    margin-bottom: 2rem;
+    color: var(--accent-color);
+    font-size: 1.8rem; /* שינוי גודל לוגו */
     font-weight: bold;
-    padding-bottom: 20px;
 }
 
 .sidenav ul {
     list-style: none;
-    padding: 0;
+    padding: 0 1rem;
 }
 
 .sidenav ul li {
-    padding: 10px;
+    margin-bottom: 1.5rem; /* הגדלת המרווחים בין הפריטים */
 }
 
 .sidenav ul li a {
-    color: white;
+    display: flex;
+    align-items: center;
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    transition: background 0.3s;
-}
-
-.sidenav ul li a:hover,
-.sidenav ul li a.active {
-    background-color: #495057;
-}
-
-/* תוכן ראשי */
-.main-content {
-    margin-right: 270px;
-    padding: 20px;
-    width: calc(100% - 270px);
-}
-
-.page-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-/* אזור החיפוש */
-.form-container-measures {
-    background: white;
-    padding: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    font-weight: 500;
 }
 
-.form-group {
+.sidenav ul li a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--primary-color);
+    transform: translateX(10px); /* הזזה חזקה יותר */
+}
+
+header {
+    background: rgba(18, 18, 18, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 2rem;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    height: 70px;
 }
 
-.form-group label {
-    width: 130px;
-    font-weight: bold;
-}
-
-.input-field {
-    flex: 1;
-}
-
-input, select {
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 2rem;
 }
 
-/* כפתור חיפוש */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.card {
+    background: rgba(0, 0, 0, 0.7); /* שינוי צבע רקע כרטיסים */
+    backdrop-filter: blur(15px); /* בלור חזק יותר */
+    border-radius: 15px; /* קשת גבולות גדולה יותר */
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* הצללה חזקה יותר */
+}
+
+.card h2 {
+    font-size: 1.4rem; /* שינוי גודל כותרת */
+    color: var(--light-color);
+}
+
 button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     border: none;
-    border-radius: 5px;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 30px; /* קשת גבולות גדולה יותר */
+    font-weight: bold;
     cursor: pointer;
-    margin-top: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 button:hover {
-    background-color: #0056b3;
+    transform: scale(1.1); /* הגדלת הכפתור */
+    box-shadow: 0 5px 15px rgba(30, 136, 229, 0.5); /* הצללה אינטנסיבית יותר */
 }
 
-/* טבלת המדידות */
-.table-container {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+@media (max-width: 768px) {
+    .sidenav {
+        width: 200px; /* שינוי רוחב סרגל צדדי במסכים קטנים */
+    }
 
-.table-wrapper {
-    overflow-x: auto;
-}
+    .sidenav .logo, .sidenav ul li a span {
+        display: none; /* הסתרת אלמנטים */
+    }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
+    .sidenav ul li a {
+        justify-content: center;
+        padding: 1rem;
+    }
 
-th, td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
+    .content {
+        padding: 1rem;
+    }
 
-th {
-    background-color: #007bff;
-    color: white;
-}
-
-/* כפתורי עדכון ומחיקה */
-.update-btn, .delete-btn {
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    color: white;
-}
-
-.update-btn {
-    background-color: #28a745;
-}
-
-.delete-btn {
-    background-color: #dc3545;
-}
-
-.update-btn:hover {
-    background-color: #218838;
-}
-
-.delete-btn:hover {
-    background-color: #c82333;
+    .dashboard {
+        grid-template-columns: 1fr; /* מבנה גריד חד עמודי */
+        gap: 1.5rem;
+    }
 }
